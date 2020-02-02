@@ -8,6 +8,9 @@ env:
     - CACHIX_CACHE=
     - NUR_REPO=tomberek
 
+before_script:
+  - sudo mkdir /etc/nix && echo 'sandbox = true' | sudo tee /etc/nix/nix.conf
+
 matrix:
   include:
     - env: NIX_CHANNEL=https://nixos.org/channels/nixpkgs-unstable
