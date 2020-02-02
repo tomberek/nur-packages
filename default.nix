@@ -39,13 +39,13 @@ rec {
   };
 
   # Example showing how to split and rejoin existing derivation
-  fast-chunk = lib.splitDrv fasttext-langid 10;
+  fast-chunk = lib.splitFile fasttext-langid 10;
   fast-join = lib.joinDrv fast-chunk {
     outputHashAlgo = "sha256";
     outputHash = "7e69ec5451bc261cc7844e49e4792a85d7f09c06789ec800fc4a44aec362764e";
   };
 
-  hello-chunk = lib.splitDrv pkgs.hello 10;
+  hello-chunk = lib.splitDir pkgs.hello 10;
   hello-join = lib.joinDrv hello-chunk {};
 }
 

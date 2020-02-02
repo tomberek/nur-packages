@@ -23,17 +23,17 @@ with pkgs.lib; rec {
   in pkgs.runCommand "${baseNameOf url + ".chunked"}" {
     chunks = map d i;
     passthru.original_name = baseNameOf url;
-    passthru.isDir = false;
+    passthru.useTar = false;
   } ''
     for i in $chunks; do
       printf '%s\n' $i >> $out
     done
   '';
 
-  isDir = path: pathExists (path + "/.");
-
-  # Split a file into chunks
-  splitDrv = file : num :
+  # Split something into chunks
+  splitFile = splitDrv false;
+  splitDir = splitDrv true;
+  splitDrv = useTar : file : num :
   let numDigits = 3;
   in
     pkgs.runCommand "${file.name}.chunked" rec {
@@ -41,9 +41,9 @@ with pkgs.lib; rec {
     outputs = ["out"] ++ chunks;
     src = file;
     passthru.original_name = file.name;
-    passthru.isDir = isDir file;
+    passthru.useTar = useTar;
   } ''
-    if [ "${toString (isDir file)}" = "1" ]; then
+    if [ "${toString useTar}" = "1" ]; then
       tar -cf tmp.tar -C $src .
       src=tmp.tar
     fi
@@ -54,16 +54,16 @@ with pkgs.lib; rec {
     done
   '';
 
-  joinDrv = file : extraArgs :
-    pkgs.runCommand "${file.original_name}" ({
+  joinDrv = drv : extraArgs :
+    pkgs.runCommand "${drv.original_name}" ({
       preferLocalBuild = true;
       allowSubstitutes = false;
     } // extraArgs) ''
-      if [ "${toString file.isDir}" = "1" ]; then
+      if [ "${toString drv.useTar}" = "1" ]; then
         mkdir $out
-        cat ${file} | xargs cat | tar -xf - -C $out
+        cat ${drv.out} | xargs cat | tar -xf - -C $out
       else
-        cat ${file} | xargs cat > $out
+        cat ${drv.out} | xargs cat > $out
       fi
   '';
 
