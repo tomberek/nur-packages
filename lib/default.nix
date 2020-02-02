@@ -15,6 +15,7 @@ with pkgs.lib; rec {
   # drv.x001: format for chunks. Currently supports up to 999 chunks.
 
   # Extension of fetch url that fetches directly into a split derivation
+  # can prefetch hashes using the ./nix-prefetch-urlchunked.sh script
   fetchurlChunked = {chunksize ? 1024 * 1024 * 64, hashes,url,...}@args : with pkgs.lib;
   let
     chunknum = length(hashes);
