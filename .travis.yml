@@ -1,8 +1,6 @@
 language: nix
 nix: 2.3.2
 
-sudo: false
-
 env:
   global:
     - CACHIX_CACHE=
